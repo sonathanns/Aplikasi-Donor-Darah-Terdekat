@@ -21,8 +21,21 @@ class RegisterScreen extends StatelessWidget {
     final obscurePassword = true.obs;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Daftar Akun'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF212121)),
+            onPressed: () => Get.back(),
+          ),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -35,19 +48,46 @@ class RegisterScreen extends StatelessWidget {
                 const Text(
                   'Buat Akun Baru',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
+                    color: Color(0xFF212121),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 8),
+                Text(
+                  'Daftar untuk mulai donor darah',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 32),
                 TextFormField(
                   controller: nameController,
+                  style: const TextStyle(fontSize: 15),
                   decoration: InputDecoration(
                     labelText: 'Nama Lengkap',
-                    prefixIcon: const Icon(Icons.person_outlined),
+                    labelStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
+                    prefixIcon: Icon(Icons.person_outline_rounded, color: Colors.grey[600], size: 22),
+                    filled: true,
+                    fillColor: Colors.grey[50],
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
                     ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFE53935), width: 2),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Colors.red, width: 1),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                   ),
                   validator: (value) => Validators.validateRequired(value, 'Nama'),
                 ),
@@ -55,12 +95,30 @@ class RegisterScreen extends StatelessWidget {
                 TextFormField(
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
+                  style: const TextStyle(fontSize: 15),
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    prefixIcon: const Icon(Icons.email_outlined),
+                    labelStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
+                    prefixIcon: Icon(Icons.email_outlined, color: Colors.grey[600], size: 22),
+                    filled: true,
+                    fillColor: Colors.grey[50],
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
                     ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFE53935), width: 2),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Colors.red, width: 1),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                   ),
                   validator: Validators.validateEmail,
                 ),
@@ -68,24 +126,56 @@ class RegisterScreen extends StatelessWidget {
                 TextFormField(
                   controller: phoneController,
                   keyboardType: TextInputType.phone,
+                  style: const TextStyle(fontSize: 15),
                   decoration: InputDecoration(
                     labelText: 'Nomor Telepon',
-                    prefixIcon: const Icon(Icons.phone_outlined),
+                    labelStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
+                    prefixIcon: Icon(Icons.phone_outlined, color: Colors.grey[600], size: 22),
+                    filled: true,
+                    fillColor: Colors.grey[50],
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
                     ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFE53935), width: 2),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Colors.red, width: 1),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                   ),
                   validator: Validators.validatePhone,
                 ),
                 const SizedBox(height: 16),
                 Obx(() => DropdownButtonFormField<String>(
                   value: selectedBloodType.value,
+                  style: const TextStyle(fontSize: 15, color: Color(0xFF212121)),
                   decoration: InputDecoration(
                     labelText: 'Golongan Darah',
-                    prefixIcon: const Icon(Icons.water_drop_outlined),
+                    labelStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
+                    prefixIcon: Icon(Icons.water_drop_outlined, color: Colors.grey[600], size: 22),
+                    filled: true,
+                    fillColor: Colors.grey[50],
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
                     ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFE53935), width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                   ),
                   items: AppConstants.bloodTypes.map((String type) {
                     return DropdownMenuItem(
@@ -103,12 +193,33 @@ class RegisterScreen extends StatelessWidget {
                 TextFormField(
                   controller: addressController,
                   maxLines: 3,
+                  style: const TextStyle(fontSize: 15),
                   decoration: InputDecoration(
                     labelText: 'Alamat',
-                    prefixIcon: const Icon(Icons.location_on_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    labelStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.only(bottom: 50),
+                      child: Icon(Icons.location_on_outlined, color: Colors.grey[600], size: 22),
                     ),
+                    filled: true,
+                    fillColor: Colors.grey[50],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFE53935), width: 2),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Colors.red, width: 1),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                   ),
                   validator: (value) => Validators.validateRequired(value, 'Alamat'),
                 ),
@@ -116,24 +227,42 @@ class RegisterScreen extends StatelessWidget {
                 Obx(() => TextFormField(
                   controller: passwordController,
                   obscureText: obscurePassword.value,
+                  style: const TextStyle(fontSize: 15),
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock_outlined),
+                    labelStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
+                    prefixIcon: Icon(Icons.lock_outline, color: Colors.grey[600], size: 22),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        obscurePassword.value ? Icons.visibility_off : Icons.visibility,
+                        obscurePassword.value ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                        color: Colors.grey[600],
+                        size: 22,
                       ),
-                      onPressed: () {
-                        obscurePassword.value = !obscurePassword.value;
-                      },
+                      onPressed: () => obscurePassword.value = !obscurePassword.value,
                     ),
+                    filled: true,
+                    fillColor: Colors.grey[50],
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
                     ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFE53935), width: 2),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Colors.red, width: 1),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                   ),
                   validator: Validators.validatePassword,
                 )),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
                 Obx(() => CustomButton(
                   text: 'Daftar',
                   onPressed: () {
@@ -149,8 +278,32 @@ class RegisterScreen extends StatelessWidget {
                     }
                   },
                   isLoading: authController.isLoading.value,
-                  icon: Icons.app_registration,
+                  icon: Icons.check_rounded,
                 )),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Sudah punya akun? ',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 15,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => Get.back(),
+                      child: const Text(
+                        'Masuk',
+                        style: TextStyle(
+                          color: Color(0xFFE53935),
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
