@@ -46,6 +46,8 @@ class ApiService {
 
     // Kode asli untuk API
     try {
+      print('🔵 Attempting login to: ${AppConstants.baseUrl}${AppConstants.loginEndpoint}');
+
       final response = await http.post(
         Uri.parse('${AppConstants.baseUrl}${AppConstants.loginEndpoint}'),
         headers: {'Content-Type': 'application/json'},
@@ -53,13 +55,40 @@ class ApiService {
           'email': email,
           'password': password,
         }),
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw Exception('Connection timeout - pastikan backend sedang running');
+        },
       );
 
-      final data = jsonDecode(response.body);
+      print('🔵 Response status: ${response.statusCode}');
+      print('🔵 Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        final user = User.fromJson(data['user']);
-        final token = data['token'];
+        final data = jsonDecode(response.body);
+
+        // Cek struktur response
+        if (data == null || data['data'] == null) {
+          print('❌ Invalid response structure: $data');
+          return {
+            'success': false,
+            'message': 'Response dari server tidak valid',
+          };
+        }
+
+        final userData = data['data']['user'];
+        final token = data['data']['token'];
+
+        if (userData == null || token == null) {
+          print('❌ Missing user data or token');
+          return {
+            'success': false,
+            'message': 'Data login tidak lengkap',
+          };
+        }
+
+        final user = User.fromJson(userData);
         await _authService.saveAuthData(token, user);
 
         return {
@@ -68,16 +97,17 @@ class ApiService {
           'message': 'Login berhasil',
         };
       } else {
+        final data = jsonDecode(response.body);
         return {
           'success': false,
           'message': data['message'] ?? 'Login gagal',
         };
       }
     } catch (e) {
-      print('Login error: $e');
+      print('❌ Login error: $e');
       return {
         'success': false,
-        'message': 'Terjadi kesalahan koneksi',
+        'message': 'Terjadi kesalahan koneksi: $e',
       };
     }
   }
@@ -96,13 +126,21 @@ class ApiService {
 
     // Kode asli untuk API
     try {
+      print('🔵 Attempting register to: ${AppConstants.baseUrl}${AppConstants.registerEndpoint}');
+
       final response = await http.post(
         Uri.parse('${AppConstants.baseUrl}${AppConstants.registerEndpoint}'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(userData),
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw Exception('Connection timeout');
+        },
       );
 
-      final data = jsonDecode(response.body);
+      print('🔵 Response status: ${response.statusCode}');
+      print('🔵 Response body: ${response.body}');
 
       if (response.statusCode == 201) {
         return {
@@ -110,16 +148,17 @@ class ApiService {
           'message': 'Registrasi berhasil',
         };
       } else {
+        final data = jsonDecode(response.body);
         return {
           'success': false,
           'message': data['message'] ?? 'Registrasi gagal',
         };
       }
     } catch (e) {
-      print('Register error: $e');
+      print('❌ Register error: $e');
       return {
         'success': false,
-        'message': 'Terjadi kesalahan koneksi',
+        'message': 'Terjadi kesalahan koneksi: $e',
       };
     }
   }
@@ -140,20 +179,25 @@ class ApiService {
         url += '?lat=$latitude&lng=$longitude';
       }
 
+      print('🔵 Fetching blood banks from: $url');
+
       final response = await http.get(
         Uri.parse(url),
         headers: await _getHeaders(),
-      );
+      ).timeout(const Duration(seconds: 10));
+
+      print('🔵 Response status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final List bloodBanksList = data['data'] ?? data;
+        final List bloodBanksList = data['data'] ?? [];
         return bloodBanksList.map((json) => BloodBank.fromJson(json)).toList();
       } else {
-        return [];
+        print('❌ Failed to load blood banks: ${response.statusCode}');
+        return _getDummyBloodBanks();
       }
     } catch (e) {
-      print('Get blood banks error: $e');
+      print('❌ Get blood banks error: $e');
       return _getDummyBloodBanks();
     }
   }
@@ -168,20 +212,32 @@ class ApiService {
 
     // Kode asli untuk API
     try {
+      final user = await _authService.getUser();
+      if (user == null || user.id == null) {
+        print('❌ No user found');
+        return [];
+      }
+
+      final url = '${AppConstants.baseUrl}/donations/user/${user.id}';
+      print('🔵 Fetching donation history from: $url');
+
       final response = await http.get(
-        Uri.parse('${AppConstants.baseUrl}${AppConstants.donationHistoryEndpoint}'),
+        Uri.parse(url),
         headers: await _getHeaders(),
-      );
+      ).timeout(const Duration(seconds: 10));
+
+      print('🔵 Response status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final List historyList = data['data'] ?? data;
+        final List historyList = data['data'] ?? [];
         return historyList.map((json) => DonationHistory.fromJson(json)).toList();
       } else {
-        return [];
+        print('❌ Failed to load donation history: ${response.statusCode}');
+        return _getDummyDonationHistory();
       }
     } catch (e) {
-      print('Get donation history error: $e');
+      print('❌ Get donation history error: $e');
       return _getDummyDonationHistory();
     }
   }
@@ -200,13 +256,15 @@ class ApiService {
 
     // Kode asli untuk API
     try {
+      print('🔵 Creating donation: $donationData');
+
       final response = await http.post(
         Uri.parse('${AppConstants.baseUrl}${AppConstants.donationHistoryEndpoint}'),
         headers: await _getHeaders(),
         body: jsonEncode(donationData),
-      );
+      ).timeout(const Duration(seconds: 10));
 
-      final data = jsonDecode(response.body);
+      print('🔵 Response status: ${response.statusCode}');
 
       if (response.statusCode == 201) {
         return {
@@ -214,16 +272,17 @@ class ApiService {
           'message': 'Permintaan donor berhasil dibuat',
         };
       } else {
+        final data = jsonDecode(response.body);
         return {
           'success': false,
           'message': data['message'] ?? 'Gagal membuat permintaan',
         };
       }
     } catch (e) {
-      print('Create donation error: $e');
+      print('❌ Create donation error: $e');
       return {
         'success': false,
-        'message': 'Terjadi kesalahan koneksi',
+        'message': 'Terjadi kesalahan koneksi: $e',
       };
     }
   }
@@ -238,19 +297,29 @@ class ApiService {
 
     // Kode asli untuk API
     try {
+      final user = await _authService.getUser();
+      if (user == null || user.id == null) {
+        return null;
+      }
+
+      final url = '${AppConstants.baseUrl}/users/profile/${user.id}';
+      print('🔵 Fetching profile from: $url');
+
       final response = await http.get(
-        Uri.parse('${AppConstants.baseUrl}${AppConstants.profileEndpoint}'),
+        Uri.parse(url),
         headers: await _getHeaders(),
-      );
+      ).timeout(const Duration(seconds: 10));
+
+      print('🔵 Response status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return User.fromJson(data['data'] ?? data);
+        return User.fromJson(data['data']);
       } else {
         return null;
       }
     } catch (e) {
-      print('Get profile error: $e');
+      print('❌ Get profile error: $e');
       return null;
     }
   }
@@ -269,13 +338,24 @@ class ApiService {
 
     // Kode asli untuk API
     try {
+      final user = await _authService.getUser();
+      if (user == null || user.id == null) {
+        return {
+          'success': false,
+          'message': 'User tidak ditemukan',
+        };
+      }
+
+      final url = '${AppConstants.baseUrl}/users/profile/${user.id}';
+      print('🔵 Updating profile: $url');
+
       final response = await http.put(
-        Uri.parse('${AppConstants.baseUrl}${AppConstants.profileEndpoint}'),
+        Uri.parse(url),
         headers: await _getHeaders(),
         body: jsonEncode(userData),
-      );
+      ).timeout(const Duration(seconds: 10));
 
-      final data = jsonDecode(response.body);
+      print('🔵 Response status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         return {
@@ -283,16 +363,17 @@ class ApiService {
           'message': 'Profile berhasil diupdate',
         };
       } else {
+        final data = jsonDecode(response.body);
         return {
           'success': false,
           'message': data['message'] ?? 'Gagal update profile',
         };
       }
     } catch (e) {
-      print('Update profile error: $e');
+      print('❌ Update profile error: $e');
       return {
         'success': false,
-        'message': 'Terjadi kesalahan koneksi',
+        'message': 'Terjadi kesalahan koneksi: $e',
       };
     }
   }
@@ -309,7 +390,7 @@ class ApiService {
         latitude: -3.4543,
         longitude: 114.8417,
         operatingHours: 'Senin-Jumat: 08:00-16:00, Sabtu: 08:00-12:00',
-        distance: null,
+        distance: 1.2,
       ),
       BloodBank(
         id: 2,
@@ -319,7 +400,7 @@ class ApiService {
         latitude: -3.4625,
         longitude: 114.8372,
         operatingHours: '24 Jam (Unit Transfusi Darah)',
-        distance: null,
+        distance: 2.5,
       ),
       BloodBank(
         id: 3,
@@ -329,7 +410,7 @@ class ApiService {
         latitude: -3.4398,
         longitude: 114.8234,
         operatingHours: 'Senin-Jumat: 08:00-20:00',
-        distance: null,
+        distance: 3.8,
       ),
       BloodBank(
         id: 4,
@@ -339,7 +420,7 @@ class ApiService {
         latitude: -3.3189,
         longitude: 114.5897,
         operatingHours: '24 Jam',
-        distance: null,
+        distance: 15.2,
       ),
       BloodBank(
         id: 5,
@@ -349,27 +430,7 @@ class ApiService {
         latitude: -3.4507,
         longitude: 114.8295,
         operatingHours: 'Senin-Sabtu: 07:00-19:00',
-        distance: null,
-      ),
-      BloodBank(
-        id: 6,
-        name: 'Klinik Utama Medika Syariah',
-        address: 'Jl. Pangeran Suriansyah, Komet, Banjarbaru',
-        phone: '0511-4774300',
-        latitude: -3.4689,
-        longitude: 114.8456,
-        operatingHours: 'Senin-Jumat: 09:00-15:00',
-        distance: null,
-      ),
-      BloodBank(
-        id: 7,
-        name: 'RS Hidayah Banjarbaru',
-        address: 'Jl. Gatot Subroto, Guntung Payung, Banjarbaru',
-        phone: '0511-4774200',
-        latitude: -3.4421,
-        longitude: 114.8531,
-        operatingHours: 'Senin-Jumat: 08:00-16:00',
-        distance: null,
+        distance: 4.1,
       ),
     ];
   }
