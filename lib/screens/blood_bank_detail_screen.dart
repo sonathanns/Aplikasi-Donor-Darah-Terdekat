@@ -6,27 +6,35 @@ import '../controllers/auth_controller.dart';
 import '../controllers/donation_controller.dart';
 import '../widgets/custom_button.dart';
 
+/// Screen untuk menampilkan detail informasi PMI (Palang Merah Indonesia)
+/// Menampilkan informasi lengkap, kontak, dan tombol untuk mendaftar donor
 class BloodBankDetailScreen extends StatelessWidget {
   const BloodBankDetailScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Mengambil data blood bank dari arguments navigasi
     final bloodBank = Get.arguments as BloodBank;
+    // Mendapatkan instance auth controller
     final authController = Get.find<AuthController>();
+    // State untuk loading indicator
     final isLoading = false.obs;
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: CustomScrollView(
         slivers: [
+          // App bar dengan header gradient
           _buildAppBar(bloodBank),
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 24),
+                // Section informasi PMI
                 _buildInfoSection(bloodBank),
                 const SizedBox(height: 20),
+                // Section kontak dan aksi
                 _buildContactSection(bloodBank),
                 const SizedBox(height: 100),
               ],
@@ -34,15 +42,18 @@ class BloodBankDetailScreen extends StatelessWidget {
           ),
         ],
       ),
+      // Bottom bar dengan tombol daftar donor
       bottomNavigationBar: _buildBottomBar(bloodBank, authController, isLoading),
     );
   }
 
+  /// Membangun app bar dengan gradient background dan informasi dasar
   Widget _buildAppBar(BloodBank bloodBank) {
     return SliverAppBar(
       expandedHeight: 200,
       pinned: true,
       backgroundColor: const Color(0xFFE53935),
+      // Custom back button dengan background putih
       leading: Container(
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
@@ -65,6 +76,7 @@ class BloodBankDetailScreen extends StatelessWidget {
           ),
           child: Stack(
             children: [
+              // Pattern background dengan opacity rendah
               Positioned.fill(
                 child: Opacity(
                   opacity: 0.1,
@@ -75,10 +87,12 @@ class BloodBankDetailScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              // Konten utama: icon, nama, dan jarak
               Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // Icon hospital dengan background semi-transparent
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
@@ -92,6 +106,7 @@ class BloodBankDetailScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
+                    // Nama blood bank
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: Text(
@@ -104,6 +119,7 @@ class BloodBankDetailScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    // Badge jarak jika data tersedia
                     if (bloodBank.distance != null) ...[
                       const SizedBox(height: 8),
                       Container(
@@ -139,12 +155,14 @@ class BloodBankDetailScreen extends StatelessWidget {
     );
   }
 
+  /// Membangun section informasi lengkap PMI
   Widget _buildInfoSection(BloodBank bloodBank) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Heading section
           const Text(
             'Informasi',
             style: TextStyle(
@@ -154,18 +172,21 @@ class BloodBankDetailScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
+          // Card alamat
           _buildInfoCard(
             Icons.location_on_rounded,
             'Alamat',
             bloodBank.address,
           ),
           const SizedBox(height: 12),
+          // Card jam operasional
           _buildInfoCard(
             Icons.access_time_rounded,
             'Jam Operasional',
             bloodBank.operatingHours,
           ),
           const SizedBox(height: 12),
+          // Card nomor telepon
           _buildInfoCard(
             Icons.phone_rounded,
             'Telepon',
@@ -176,6 +197,7 @@ class BloodBankDetailScreen extends StatelessWidget {
     );
   }
 
+  /// Membangun card informasi individual dengan icon, label, dan value
   Widget _buildInfoCard(IconData icon, String label, String value) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -193,6 +215,7 @@ class BloodBankDetailScreen extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Icon container dengan background merah muda
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
@@ -202,10 +225,12 @@ class BloodBankDetailScreen extends StatelessWidget {
             child: Icon(icon, color: const Color(0xFFE53935), size: 22),
           ),
           const SizedBox(width: 16),
+          // Label dan value
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Label dengan warna abu-abu
                 Text(
                   label,
                   style: TextStyle(
@@ -215,6 +240,7 @@ class BloodBankDetailScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 6),
+                // Value dengan font tebal
                 Text(
                   value,
                   style: const TextStyle(
@@ -232,12 +258,14 @@ class BloodBankDetailScreen extends StatelessWidget {
     );
   }
 
+  /// Membangun section kontak dengan tombol telepon dan petunjuk arah
   Widget _buildContactSection(BloodBank bloodBank) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Heading section
           const Text(
             'Kontak',
             style: TextStyle(
@@ -249,24 +277,28 @@ class BloodBankDetailScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: [
+              // Tombol telepon
               Expanded(
                 child: _buildActionButton(
                   'Telepon',
                   Icons.phone_rounded,
                   const Color(0xFF2196F3),
                       () async {
+                    // Membuka dialer telepon
                     final Uri launchUri = Uri(scheme: 'tel', path: bloodBank.phone);
                     await launchUrl(launchUri);
                   },
                 ),
               ),
               const SizedBox(width: 12),
+              // Tombol petunjuk arah
               Expanded(
                 child: _buildActionButton(
                   'Petunjuk',
                   Icons.map_rounded,
                   const Color(0xFF4CAF50),
                       () async {
+                    // Membuka Google Maps dengan koordinat PMI
                     final url = 'https://www.google.com/maps/search/?api=1&query=${bloodBank.latitude},${bloodBank.longitude}';
                     await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
                   },
@@ -279,6 +311,7 @@ class BloodBankDetailScreen extends StatelessWidget {
     );
   }
 
+  /// Membangun tombol aksi dengan icon dan label
   Widget _buildActionButton(String label, IconData icon, Color color, VoidCallback onPressed) {
     return ElevatedButton(
       onPressed: onPressed,
@@ -309,6 +342,7 @@ class BloodBankDetailScreen extends StatelessWidget {
     );
   }
 
+  /// Membangun bottom bar dengan tombol daftar donor
   Widget _buildBottomBar(BloodBank bloodBank, AuthController authController, RxBool isLoading) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -333,7 +367,9 @@ class BloodBankDetailScreen extends StatelessWidget {
     );
   }
 
+  /// Menampilkan dialog konfirmasi untuk membuat permintaan donor
   void _createDonationRequest(BloodBank bloodBank, AuthController authController) {
+    // Mengambil data user yang sedang login
     final user = authController.currentUser.value;
     if (user == null) return;
 
@@ -345,6 +381,7 @@ class BloodBankDetailScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Icon volunteer dengan background merah muda
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -358,6 +395,7 @@ class BloodBankDetailScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
+              // Judul dialog
               const Text(
                 'Konfirmasi Donor',
                 style: TextStyle(
@@ -366,6 +404,7 @@ class BloodBankDetailScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
+              // Container informasi donor
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -374,10 +413,13 @@ class BloodBankDetailScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
+                    // Info lokasi PMI
                     _buildDialogInfo('Lokasi', bloodBank.name),
                     const Divider(height: 20),
+                    // Info golongan darah user
                     _buildDialogInfo('Golongan Darah', user.bloodType),
                     const Divider(height: 20),
+                    // Info jumlah darah yang akan didonor
                     _buildDialogInfo('Jumlah', '350 ml'),
                   ],
                 ),
@@ -385,6 +427,7 @@ class BloodBankDetailScreen extends StatelessWidget {
               const SizedBox(height: 24),
               Row(
                 children: [
+                  // Tombol batal
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Get.back(),
@@ -398,10 +441,12 @@ class BloodBankDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
+                  // Tombol konfirmasi
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
                         Get.back();
+                        // Membuat donation request ke controller
                         final donationController = Get.put(DonationController());
                         donationController.createDonation({
                           'user_id': user.id,
@@ -432,10 +477,12 @@ class BloodBankDetailScreen extends StatelessWidget {
     );
   }
 
+  /// Membangun baris informasi untuk dialog dengan label dan value
   Widget _buildDialogInfo(String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        // Label dengan warna abu-abu
         Text(
           label,
           style: TextStyle(
@@ -443,6 +490,7 @@ class BloodBankDetailScreen extends StatelessWidget {
             fontSize: 14,
           ),
         ),
+        // Value dengan font tebal
         Text(
           value,
           style: const TextStyle(

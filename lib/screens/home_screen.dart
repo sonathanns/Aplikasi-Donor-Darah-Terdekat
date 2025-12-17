@@ -3,11 +3,14 @@ import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/blood_bank_controller.dart';
 
+/// Screen utama aplikasi donor darah
+/// Menampilkan header welcome, menu cepat, PMI terdekat, dan drawer navigation
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Mendapatkan instance controller
     final authController = Get.find<AuthController>();
     final bloodBankController = Get.find<BloodBankController>();
 
@@ -15,19 +18,24 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: Colors.grey[50],
       body: SafeArea(
         child: RefreshIndicator(
+          // Pull-to-refresh untuk reload data PMI
           onRefresh: () => bloodBankController.refreshBloodBanks(),
           color: const Color(0xFFE53935),
           child: CustomScrollView(
             slivers: [
+              // App bar dengan menu dan notifikasi
               _buildAppBar(authController),
               SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Header dengan greeting dan golongan darah
                     _buildHeader(authController),
                     const SizedBox(height: 24),
+                    // Menu cepat: Cari PMI dan Riwayat
                     _buildQuickActions(),
                     const SizedBox(height: 32),
+                    // Section PMI terdekat
                     _buildNearbySection(bloodBankController),
                     const SizedBox(height: 24),
                   ],
@@ -37,10 +45,12 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
+      // Navigation drawer
       drawer: _buildDrawer(authController),
     );
   }
 
+  /// Membangun app bar floating dengan icon menu dan notifikasi
   Widget _buildAppBar(AuthController authController) {
     return SliverAppBar(
       expandedHeight: 0,
@@ -48,6 +58,7 @@ class HomeScreen extends StatelessWidget {
       pinned: false,
       backgroundColor: Colors.white,
       elevation: 0,
+      // Menu button untuk membuka drawer
       leading: Builder(
         builder: (context) => IconButton(
           icon: const Icon(Icons.menu_rounded, color: Color(0xFF212121)),
@@ -55,6 +66,7 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       actions: [
+        // Notification button (fitur belum tersedia)
         Container(
           margin: const EdgeInsets.only(right: 16, top: 8, bottom: 8),
           decoration: BoxDecoration(
@@ -78,6 +90,8 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  /// Membangun header dengan gradient background
+  /// Menampilkan greeting user dan badge golongan darah
   Widget _buildHeader(AuthController authController) {
     return Container(
       margin: const EdgeInsets.all(20),
@@ -102,6 +116,7 @@ class HomeScreen extends StatelessWidget {
         children: [
           Row(
             children: [
+              // Icon tetesan darah
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -115,6 +130,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const Spacer(),
+              // Badge golongan darah user
               Obx(() => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
@@ -139,6 +155,7 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
+          // Greeting dengan nama user
           Obx(() => Text(
             'Halo, ${authController.currentUser.value?.name ?? "Donor"}!',
             style: const TextStyle(
@@ -148,6 +165,7 @@ class HomeScreen extends StatelessWidget {
             ),
           )),
           const SizedBox(height: 6),
+          // Subtitle motivasi
           Text(
             'Siap berbagi kehidupan hari ini?',
             style: TextStyle(
@@ -160,12 +178,14 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  /// Membangun section menu cepat dengan 2 card action
   Widget _buildQuickActions() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Heading section
           const Text(
             'Menu Cepat',
             style: TextStyle(
@@ -177,6 +197,7 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: [
+              // Card Cari PMI
               Expanded(
                 child: _buildActionCard(
                   'Cari PMI',
@@ -187,6 +208,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
+              // Card Riwayat
               Expanded(
                 child: _buildActionCard(
                   'Riwayat',
@@ -203,6 +225,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  /// Membangun card action individual dengan icon, title, subtitle, dan warna
   Widget _buildActionCard(String title, String subtitle, IconData icon, Color color, VoidCallback onTap) {
     return Material(
       color: Colors.transparent,
@@ -219,6 +242,7 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Icon dalam container berwarna
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
@@ -228,6 +252,7 @@ class HomeScreen extends StatelessWidget {
                 child: Icon(icon, size: 24, color: Colors.white),
               ),
               const SizedBox(height: 12),
+              // Title dengan warna sesuai tema
               Text(
                 title,
                 style: TextStyle(
@@ -237,6 +262,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
+              // Subtitle dengan warna abu-abu
               Text(
                 subtitle,
                 style: TextStyle(
@@ -251,10 +277,12 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  /// Membangun section PMI terdekat dengan list dan tombol lihat semua
   Widget _buildNearbySection(BloodBankController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Header dengan title dan link lihat semua
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
@@ -268,6 +296,7 @@ class HomeScreen extends StatelessWidget {
                   color: Color(0xFF212121),
                 ),
               ),
+              // Tombol navigasi ke halaman daftar lengkap
               TextButton(
                 onPressed: () => Get.toNamed('/blood-banks'),
                 child: const Text(
@@ -283,6 +312,7 @@ class HomeScreen extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Obx(() {
+          // Menampilkan loading state
           if (controller.isLoading.value) {
             return const Center(
               child: Padding(
@@ -292,6 +322,7 @@ class HomeScreen extends StatelessWidget {
             );
           }
 
+          // Menampilkan empty state jika tidak ada data
           if (controller.nearbyBloodBanks.isEmpty) {
             return Padding(
               padding: const EdgeInsets.all(40),
@@ -310,6 +341,7 @@ class HomeScreen extends StatelessWidget {
             );
           }
 
+          // Menampilkan list PMI terdekat
           return ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -317,6 +349,7 @@ class HomeScreen extends StatelessWidget {
             itemCount: controller.nearbyBloodBanks.length,
             itemBuilder: (context, index) {
               final bloodBank = controller.nearbyBloodBanks[index];
+              // Card untuk setiap PMI
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
@@ -333,12 +366,14 @@ class HomeScreen extends StatelessWidget {
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
+                    // Navigasi ke detail saat card diklik
                     onTap: () => Get.toNamed('/blood-bank-detail', arguments: bloodBank),
                     borderRadius: BorderRadius.circular(16),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Row(
                         children: [
+                          // Icon hospital
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
@@ -352,10 +387,12 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 16),
+                          // Info nama dan jarak PMI
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                // Nama PMI
                                 Text(
                                   bloodBank.name,
                                   style: const TextStyle(
@@ -365,6 +402,7 @@ class HomeScreen extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 4),
+                                // Jarak dari user
                                 Row(
                                   children: [
                                     Icon(Icons.location_on_rounded, size: 14, color: Colors.grey[600]),
@@ -383,6 +421,7 @@ class HomeScreen extends StatelessWidget {
                               ],
                             ),
                           ),
+                          // Arrow indicator
                           Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey[400]),
                         ],
                       ),
@@ -397,12 +436,13 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  /// Membangun navigation drawer dengan profile header dan menu items
   Widget _buildDrawer(AuthController authController) {
     return Drawer(
       backgroundColor: Colors.white,
       child: Column(
         children: [
-          // Header with gradient
+          // Header drawer dengan gradient dan info user
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(24, 60, 24, 32),
@@ -420,7 +460,7 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Avatar
+                // Avatar dengan initial nama user
                 Container(
                   width: 70,
                   height: 70,
@@ -447,7 +487,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Name
+                // Nama user
                 Obx(() => Text(
                   authController.currentUser.value?.name ?? 'Donor',
                   style: const TextStyle(
@@ -459,7 +499,7 @@ class HomeScreen extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 )),
                 const SizedBox(height: 4),
-                // Email
+                // Email user
                 Obx(() => Text(
                   authController.currentUser.value?.email ?? '',
                   style: TextStyle(
@@ -470,7 +510,7 @@ class HomeScreen extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 )),
                 const SizedBox(height: 12),
-                // Blood Type Badge
+                // Badge golongan darah
                 Obx(() => Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
@@ -497,11 +537,12 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
           ),
-          // Menu Items
+          // Menu items list
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 16),
               children: [
+                // Menu Beranda (active state)
                 _buildDrawerItem(
                   Icons.home_rounded,
                   'Beranda',
@@ -509,6 +550,7 @@ class HomeScreen extends StatelessWidget {
                   isActive: true,
                 ),
                 const SizedBox(height: 4),
+                // Menu Daftar PMI
                 _buildDrawerItem(
                   Icons.local_hospital_rounded,
                   'Daftar PMI',
@@ -518,6 +560,7 @@ class HomeScreen extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 4),
+                // Menu Riwayat Donor
                 _buildDrawerItem(
                   Icons.history_rounded,
                   'Riwayat Donor',
@@ -527,6 +570,7 @@ class HomeScreen extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 4),
+                // Menu Profile
                 _buildDrawerItem(
                   Icons.person_rounded,
                   'Profile',
@@ -536,11 +580,13 @@ class HomeScreen extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 8),
+                // Divider
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Divider(color: Colors.grey[300]),
                 ),
                 const SizedBox(height: 8),
+                // Menu Keluar (destructive action)
                 _buildDrawerItem(
                   Icons.logout_rounded,
                   'Keluar',
@@ -550,7 +596,7 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
           ),
-          // Footer
+          // Footer dengan versi app
           Padding(
             padding: const EdgeInsets.all(20),
             child: Text(
@@ -567,6 +613,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  /// Membangun item menu drawer dengan icon, title, dan styling dinamis
   Widget _buildDrawerItem(
       IconData icon,
       String title,
@@ -577,10 +624,12 @@ class HomeScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
+        // Highlight background untuk menu aktif
         color: isActive ? const Color(0xFFE53935).withOpacity(0.1) : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
+        // Icon dengan container dan warna dinamis
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
@@ -601,6 +650,7 @@ class HomeScreen extends StatelessWidget {
                 : Colors.grey[700],
           ),
         ),
+        // Title dengan styling dinamis
         title: Text(
           title,
           style: TextStyle(
@@ -613,6 +663,7 @@ class HomeScreen extends StatelessWidget {
             fontSize: 15,
           ),
         ),
+        // Trailing arrow (kecuali untuk item destructive)
         trailing: !isDestructive
             ? Icon(
           Icons.arrow_forward_ios_rounded,
@@ -629,6 +680,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  /// Menampilkan dialog konfirmasi logout
   void _showLogoutDialog(AuthController authController) {
     Get.dialog(
       Dialog(
@@ -638,6 +690,7 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Icon logout dengan background merah
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -651,6 +704,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
+              // Title dialog
               const Text(
                 'Keluar Aplikasi',
                 style: TextStyle(
@@ -659,6 +713,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
+              // Pesan konfirmasi
               Text(
                 'Apakah Anda yakin ingin keluar dari aplikasi?',
                 textAlign: TextAlign.center,
@@ -670,6 +725,7 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 24),
               Row(
                 children: [
+                  // Tombol Batal
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Get.back(),
@@ -683,10 +739,12 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
+                  // Tombol Keluar
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
                         Get.back();
+                        // Memanggil fungsi logout dari auth controller
                         authController.logout();
                       },
                       style: ElevatedButton.styleFrom(
